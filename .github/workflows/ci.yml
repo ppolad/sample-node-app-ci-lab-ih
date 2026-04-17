@@ -10,7 +10,7 @@ permissions:
   checks: write
   pull-requests: write
   # If you plan to switch to OIDC later, keep id-token: write
-  id-token: write
+ # id-token: write
 
 jobs:
   build-test-and-deploy:
@@ -39,7 +39,7 @@ jobs:
 
       - name: Azure Login (Service Principal)
         # If you adopt OIDC later, switch to federated creds and drop client-secret
-        uses: azure/login@v2
+        uses: azure/login@v1
         with:
           client-id: ${{ secrets.AZURE_CREDENTIALS }}
 
