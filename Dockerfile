@@ -1,4 +1,4 @@
-# Define a base layer
+ Define a base layer
 FROM node:22-alpine
 
 LABEL author=saurabh
