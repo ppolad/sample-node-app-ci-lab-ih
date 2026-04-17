@@ -39,7 +39,7 @@ jobs:
 
       - name: Azure Login (Service Principal)
         # If you adopt OIDC later, switch to federated creds and drop client-secret
-        uses: azure/login@v2
+        uses: azure/login@v1
         with:
           client-id: ${{ secrets.AZURE_CREDENTIALS }}}
 
