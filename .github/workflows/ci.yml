@@ -12,10 +12,10 @@ permissions:
  id-token: write
 
 env:
-  APP_PORT: 3000
-  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/frontendapp-node
-  AZURE_RESOURCE_GROUP: polad-labbo
-  AZURE_WEBAPP_NAME: polad-app-3
+ APP_PORT: 3000
+ IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/frontendapp-node
+ AZURE_RESOURCE_GROUP: web-labs-rg-saurabh
+ AZURE_WEBAPP_NAME: frontendapp-web-saurabh
 
 jobs:
  build-test-and-deploy:
@@ -41,28 +41,31 @@ jobs:
 
      - name: Build (optional)
        run: npm run build 2>/dev/null || echo "No build step; continuing."
+
      - name: Azure Login (Service Principal)
-     - name: Azure Login (Service Principal)
-      uses: azure/login@v2
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+       # If you adopt OIDC later, drop client-secret and configure federated creds
+       uses: azure/login@v2
+       with:
+         client-id: ${{ secrets.AZURE_CLIENT_ID }}
+         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+         client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
 
      - name: Login to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCERHUB_NAME }}
+       uses: docker/login-action@v3
+       with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
      - name: Build and push Docker image to Docker Hub
-      uses: docker/build-push-action@v6
-      with:
-        context: .
-        file: ./Dockerfile
-        push: true
-        tags: |
-          ${{ env.IMAGE_NAME }}:${{ github.sha }}
-          ${{ env.IMAGE_NAME }}:latest
-    
+       uses: docker/build-push-action@v6
+       with:
+         context: .
+         file: ./Dockerfile
+         push: true
+         tags: |
+           ${{ env.IMAGE_NAME }}:${{ github.sha }}
+           ${{ env.IMAGE_NAME }}:latest
 
      - name: Configure Web App to use the new image
        run: |
@@ -87,4 +90,4 @@ jobs:
 
          # Restart to pull the new image immediately
          az webapp restart -g "${{ env.AZURE_RESOURCE_GROUP }}" -n "${{ env.AZURE_WEBAPP_NAME }}"
- 
+
